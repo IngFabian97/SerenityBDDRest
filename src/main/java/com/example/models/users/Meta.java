@@ -6,7 +6,13 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Meta {
     
     @JsonProperty("powered_by")
@@ -29,62 +35,6 @@ public class Meta {
     private String upgradeCta;
     
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
-
-    public String getPoweredBy() {
-        return poweredBy;
-    }
-
-    public void setPoweredBy(String poweredBy) {
-        this.poweredBy = poweredBy;
-    }
-
-    public String getUpgradeUrl() {
-        return upgradeUrl;
-    }
-
-    public void setUpgradeUrl(String upgradeUrl) {
-        this.upgradeUrl = upgradeUrl;
-    }
-
-    public String getDocsUrl() {
-        return docsUrl;
-    }
-
-    public void setDocsUrl(String docsUrl) {
-        this.docsUrl = docsUrl;
-    }
-
-    public String getTemplateGallery() {
-        return templateGallery;
-    }
-
-    public void setTemplateGallery(String templateGallery) {
-        this.templateGallery = templateGallery;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public List<String> getFeatures() {
-        return features;
-    }
-
-    public void setFeatures(List<String> features) {
-        this.features = features;
-    }
-
-    public String getUpgradeCta() {
-        return upgradeCta;
-    }
-
-    public void setUpgradeCta(String upgradeCta) {
-        this.upgradeCta = upgradeCta;
-    }
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {

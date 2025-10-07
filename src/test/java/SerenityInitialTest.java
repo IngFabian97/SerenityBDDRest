@@ -47,24 +47,22 @@ public class SerenityInitialTest {
 
     }
 
-    // @Test
-    // public void registerUserTest() {
-    //     Actor fabian = Actor.named("Fabian")
-    //         .whoCan(CallAnApi.at(BASE_URL));
+    @Test
+    public void registerUserTest() {
+        Actor fabian = Actor.named("Fabian")
+            .whoCan(CallAnApi.at(BASE_URL));
 
-    //     RegisterUserInfo userInfo = new RegisterUserInfo();
+        RegisterUserInfo userInfo = RegisterUserInfo.builder()
+            .email("eve.holt@reqres.in")
+            .password("pistol")
+            .build();
 
-    //     userInfo.setEmail("eve.holt@reqres.in");
-    //     userInfo.setPassword("pistol");
+        fabian.attemptsTo(
+            RegisterUser.withInfo(userInfo)
+        ); 
 
-    //     fabian.attemptsTo(
-    //         RegisterUser.withInfo(userInfo)
-    //     ); 
-
-    //     fabian.should(seeThat("El codigo de respuesta", ResponseCode.was(), equalTo(200)));
-    // }
-
-
+        fabian.should(seeThat("El codigo de respuesta", ResponseCode.was(), equalTo(200)));
+    }
 
     
 }
