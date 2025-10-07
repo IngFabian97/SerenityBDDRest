@@ -26,6 +26,7 @@ private final int page;
                 .with(requestSpecification -> 
                     requestSpecification
                         .contentType(ContentType.JSON)
+                        .header("x-api-key", "reqres-free-v1")
                         .header("header1", "value1")
                 )
         );

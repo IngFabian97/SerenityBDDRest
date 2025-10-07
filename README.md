@@ -31,16 +31,27 @@ Proyecto de automatización de pruebas REST API usando **Serenity BDD**, **REST 
 
 ```
 serenitybddrest/
-├── build.gradle.kts          # Configuración de Gradle (Kotlin DSL)
-├── settings.gradle.kts        # Configuración del proyecto
-├── gradle.properties          # Propiedades y perfiles
-├── gradlew                    # Wrapper de Gradle para Unix/Mac
-├── gradlew.bat                # Wrapper de Gradle para Windows
-├── gradle/                    # Archivos del Gradle Wrapper
+├── build.gradle.kts              # Configuración de Gradle (Kotlin DSL)
+├── settings.gradle.kts           # Configuración del proyecto
+├── gradle.properties             # Propiedades y perfiles
+├── gradlew                       # Wrapper de Gradle para Unix/Mac
+├── gradlew.bat                   # Wrapper de Gradle para Windows
+├── gradle/                       # Archivos del Gradle Wrapper
 ├── src/
-│   ├── main/java/            # Código fuente
-│   └── test/java/            # Tests
-└── target/site/serenity/     # Reportes generados
+│   ├── main/java/
+│   │   └── com/example/
+│   │       ├── models/           # Modelos de datos (POJOs)
+│   │       │   └── users/        # Users, Datum, Support, Meta, RegisterUserInfo
+│   │       ├── tasks/            # Tasks del patrón Screenplay
+│   │       │   ├── GetUsers.java
+│   │       │   └── RegisterUser.java
+│   │       └── questions/        # Questions del patrón Screenplay
+│   │           ├── GetUsersQuestion.java
+│   │           └── ResponseCode.java
+│   └── test/java/
+│       └── SerenityInitialTest.java  # Tests de ejemplo
+├── target/site/serenity/         # Reportes HTML generados
+└── .github/workflows/            # CI/CD con GitHub Actions
 ```
 
 ## 🎯 Comandos Principales
@@ -138,7 +149,24 @@ Gradle cache está habilitado para acelerar las compilaciones.
 ### Logs personalizados
 Los tests muestran información de los tests que pasan, fallan o se saltan.
 
+## 🔍 Características del Proyecto
+
+### ✅ Buenas Prácticas Implementadas
+- **Screenplay Pattern**: Arquitectura orientada a tareas para tests más legibles
+- **Modelos con Jackson**: Deserialización automática con `@JsonProperty`
+- **Separation of Concerns**: Tasks, Questions y Models separados
+- **Type Safety**: Uso de genéricos y tipos específicos
+- **CI/CD**: GitHub Actions con ejecución automática de tests
+- **Living Documentation**: Reportes HTML detallados con Serenity
+
+### 🎯 API Utilizada
+El proyecto utiliza la API pública [ReqRes](https://reqres.in/) para demostración:
+- **GET** `/users?page={page}` - Listar usuarios
+- **POST** `/register` - Registrar usuario
+
 ## 📝 Ejemplo de Test
+
+El proyecto utiliza el **Screenplay Pattern** para escribir tests más legibles y mantenibles:
 
 ```java
 @ExtendWith(SerenityJUnit5Extension.class)
@@ -147,18 +175,71 @@ public class SerenityInitialTest {
     public static final String BASE_URL = "https://reqres.in/api";
 
     @Test
-    public void getUsers() {
+    public void getUsersFromApi() {
         Actor fabian = Actor.named("Fabian")
             .whoCan(CallAnApi.at(BASE_URL));
 
+        // Ejecutar la tarea de obtener usuarios de la página 2
         fabian.attemptsTo(
-            Get.resource("/users?page=2")
+            GetUsers.fromPage(2)
         );
 
-        assertThat(SerenityRest.lastResponse().statusCode()).isEqualTo(200);
+        // Verificar el código de respuesta
+        fabian.should(seeThat("El codigo de respuesta", ResponseCode.was(), equalTo(200)));
+   
+        // Deserializar y buscar un usuario específico
+        Datum user = new GetUsersQuestion().answeredBy(fabian).getData().stream()
+            .filter(u -> u.getId() == 7)
+            .findFirst()
+            .orElse(null);
+
+        // Verificar datos del usuario
+        fabian.should(
+            seeThat("Usuario no es nulo", act -> user, notNullValue()),
+            seeThat("El email del usuario", act -> user.getEmail(), equalTo("michael.lawson@reqres.in")),
+            seeThat("El avatar del usuario", act -> user.getAvatar(), equalTo("https://reqres.in/img/faces/7-image.jpg"))
+        );
+    }
+
+    @Test
+    public void registerUserTest() {
+        Actor fabian = Actor.named("Fabian")
+            .whoCan(CallAnApi.at(BASE_URL));
+
+        RegisterUserInfo userInfo = new RegisterUserInfo();
+        userInfo.setEmail("eve.holt@reqres.in");
+        userInfo.setPassword("pistol");
+
+        // Registrar usuario
+        fabian.attemptsTo(
+            RegisterUser.withInfo(userInfo)
+        ); 
+
+        // Verificar registro exitoso
+        fabian.should(seeThat("El codigo de respuesta", ResponseCode.was(), equalTo(200)));
     }
 }
 ```
+
+### 📚 Componentes del Screenplay Pattern
+
+#### 🎭 Tasks (Tareas)
+Representan acciones de alto nivel que un actor puede realizar:
+- `GetUsers.fromPage(int page)` - Obtener usuarios de una página específica
+- `RegisterUser.withInfo(RegisterUserInfo info)` - Registrar un nuevo usuario
+
+#### ❓ Questions (Preguntas)
+Consultan el estado del sistema:
+- `ResponseCode.was()` - Obtiene el código de respuesta HTTP
+- `GetUsersQuestion` - Deserializa la respuesta a un objeto `Users`
+
+#### 📋 Models (Modelos)
+POJOs para mapear respuestas JSON con anotaciones Jackson:
+- `Users` - Respuesta completa con paginación, data, support y _meta
+- `Datum` - Información de un usuario individual
+- `Support` - Información de soporte del API
+- `Meta` - Metadatos del API ReqRes
+- `RegisterUserInfo` - Datos para registro de usuario
 
 ##  Troubleshooting
 
