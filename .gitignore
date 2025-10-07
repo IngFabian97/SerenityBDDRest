@@ -1,0 +1,46 @@
+# Gradle
+.gradle/
+build/
+!gradle-wrapper.jar
+*.iml
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.ipr
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# NetBeans
+nbproject/
+nbbuild/
+dist/
+nbdist/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Serenity Reports
+target/
+serenity/
+
+# Test Reports
+test-output/
+**/test-results/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
