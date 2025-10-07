@@ -1,6 +1,16 @@
 # Serenity BDD REST Automation Framework
 
+[![Serenity BDD Tests](https://github.com/IngFabian97/SerenityBDDRest/actions/workflows/ci.yml/badge.svg)](https://github.com/IngFabian97/SerenityBDDRest/actions/workflows/ci.yml)
+[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
+[![Gradle](https://img.shields.io/badge/Gradle-8.10.2-blue.svg)](https://gradle.org/)
+[![Serenity BDD](https://img.shields.io/badge/Serenity%20BDD-4.2.1-green.svg)](https://serenity-bdd.info/)
+
 Proyecto de automatización de pruebas REST API usando **Serenity BDD**, **REST Assured**, **JUnit 5** y **Gradle**.
+
+## 🔗 Enlaces
+
+- **Repositorio:** [https://github.com/IngFabian97/SerenityBDDRest](https://github.com/IngFabian97/SerenityBDDRest)
+- **CI/CD:** [GitHub Actions](https://github.com/IngFabian97/SerenityBDDRest/actions)
 
 ## 🚀 Tecnologías
 
