@@ -34,6 +34,7 @@ serenitybddrest/
 ├── build.gradle.kts              # Configuración de Gradle (Kotlin DSL)
 ├── settings.gradle.kts           # Configuración del proyecto
 ├── gradle.properties             # Propiedades y perfiles
+├── serenity.properties           # Configuración de Serenity BDD y Cucumber
 ├── gradlew                       # Wrapper de Gradle para Unix/Mac
 ├── gradlew.bat                   # Wrapper de Gradle para Windows
 ├── gradle/                       # Archivos del Gradle Wrapper
@@ -45,12 +46,23 @@ serenitybddrest/
 │   │       ├── tasks/            # Tasks del patrón Screenplay
 │   │       │   ├── GetUsers.java
 │   │       │   └── RegisterUser.java
-│   │       └── questions/        # Questions del patrón Screenplay
-│   │           ├── GetUsersQuestion.java
-│   │           └── ResponseCode.java
-│   └── test/java/
-│       └── SerenityInitialTest.java  # Tests de ejemplo
-├── target/site/serenity/         # Reportes HTML generados
+│   │       ├── questions/        # Questions del patrón Screenplay
+│   │       │   ├── GetUsersQuestion.java
+│   │       │   └── ResponseCode.java
+│   │       ├── interactions/     # Interacciones personalizadas
+│   │       │   └── Post.java
+│   │       └── stepdefinitios/   # Step Definitions de Cucumber
+│   │           └── RegisterUserSteps.java
+│   ├── test/java/
+│   │   ├── com/example/runners/
+│   │   │   └── CucumberTestSuite.java  # Runner de Cucumber
+│   │   └── SerenityInitialTest.java    # Tests JUnit 5
+│   └── test/resources/
+│       └── features/             # Archivos .feature de Cucumber
+│           └── register_users.feature
+├── target/
+│   ├── site/serenity/            # Reportes HTML de Serenity
+│   └── cucumber-reports/         # Reportes de Cucumber
 └── .github/workflows/            # CI/CD con GitHub Actions
 ```
 
@@ -63,11 +75,17 @@ serenitybddrest/
 
 ### Ejecutar tests
 ```bash
-# Ejecutar todos los tests
+# Ejecutar todos los tests (JUnit + Cucumber)
 ./gradlew test
+
+# Ejecutar solo tests de Cucumber
+./gradlew test --tests "CucumberTestSuite"
 
 # Ejecutar tests de integración
 ./gradlew integrationTest
+
+# Ejecutar un feature específico por tags
+./gradlew test -Dcucumber.filter.tags="@regression"
 
 # Limpiar y ejecutar tests
 ./gradlew clean test
@@ -153,16 +171,103 @@ Los tests muestran información de los tests que pasan, fallan o se saltan.
 
 ### ✅ Buenas Prácticas Implementadas
 - **Screenplay Pattern**: Arquitectura orientada a tareas para tests más legibles
+- **BDD con Cucumber**: Escenarios escritos en Gherkin para colaboración con no técnicos
 - **Modelos con Jackson**: Deserialización automática con `@JsonProperty`
-- **Separation of Concerns**: Tasks, Questions y Models separados
+- **Separation of Concerns**: Tasks, Questions, Models y Step Definitions separados
 - **Type Safety**: Uso de genéricos y tipos específicos
 - **CI/CD**: GitHub Actions con ejecución automática de tests
 - **Living Documentation**: Reportes HTML detallados con Serenity
+- **Configuración flexible**: Soporte para múltiples entornos (dev/prod)
 
 ### 🎯 API Utilizada
 El proyecto utiliza la API pública [ReqRes](https://reqres.in/) para demostración:
 - **GET** `/users?page={page}` - Listar usuarios
 - **POST** `/register` - Registrar usuario
+
+## 🥒 Cucumber BDD
+
+El proyecto está configurado para ejecutar tests con **Cucumber** usando el formato **Gherkin** para escribir escenarios de prueba en lenguaje natural.
+
+### Estructura de Cucumber
+
+#### 📄 Features (Características)
+Los archivos `.feature` se encuentran en `src/test/resources/features/` y describen el comportamiento esperado:
+
+```gherkin
+Feature: Register User
+    Con el fin de poder administrar mis productos bancarios
+    yo como usuario quiero poder registrarme 
+    para poder utilizar pagos y ejecutar operaciones sobre mis productos
+
+Scenario: Registro de usuario exitoso
+    Given Fabian es un cliente que quiere poder administar sus productos
+    When el envia la informacion requerida para el registro
+    Then el deberia obtener una cuenta virtual para poder ingresar cuando lo requiera
+```
+
+#### 🔧 Step Definitions (Definiciones de Pasos)
+Los steps se implementan en `src/main/java/com/example/stepdefinitios/`:
+
+```java
+@Given("Fabian es un cliente que quiere poder administar sus productos")
+public void fabianEsUnClienteQueQuierePoderAdministarSusProductos() {
+    String baseUrl = System.getProperty("restapi.baseurl", "https://reqres.in/api");
+    fabian = Actor.named("Fabian")
+        .whoCan(CallAnApi.at(baseUrl));
+}
+
+@When("el envia la informacion requerida para el registro")
+public void elEnvíaLaInformacionRequeridaParaElRegistro() {
+    RegisterUserInfo userInfo = new RegisterUserInfo();
+    userInfo.setEmail("eve.holt@reqres.in");
+    userInfo.setPassword("pistol");
+    
+    fabian.attemptsTo(RegisterUser.withInfo(userInfo));
+}
+
+@Then("el deberia obtener una cuenta virtual para poder ingresar cuando lo requiera")
+public void elDeberiaObtenerUnaCuentaVirtualParaPoderIngresarCuandoLoRequiera() {
+    fabian.should(seeThat("El codigo de respuesta", ResponseCode.was(), equalTo(200)));
+}
+```
+
+#### 🏃 Runner de Cucumber
+El runner `CucumberTestSuite.java` configura la ejecución de Cucumber:
+
+```java
+@Suite
+@IncludeEngines("cucumber")
+@SelectClasspathResource("features")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.example.stepdefinitios")
+public class CucumberTestSuite {
+}
+```
+
+### Ejecutar Tests con Cucumber
+
+```bash
+# Ejecutar todos los tests de Cucumber
+./gradlew test --tests "CucumberTestSuite"
+
+# Ejecutar con tags específicos
+./gradlew test -Dcucumber.filter.tags="@smoke"
+./gradlew test -Dcucumber.filter.tags="@regression"
+./gradlew test -Dcucumber.filter.tags="not @wip"
+
+# Ver reportes de Cucumber
+open target/cucumber-reports/cucumber.html
+```
+
+### Tags en Cucumber
+
+Puedes agregar tags a tus escenarios en los archivos `.feature`:
+
+```gherkin
+@smoke @regression
+Scenario: Registro de usuario exitoso
+    Given Fabian es un cliente que quiere poder administar sus productos
+    ...
+```
 
 ## 📝 Ejemplo de Test
 
@@ -240,6 +345,15 @@ POJOs para mapear respuestas JSON con anotaciones Jackson:
 - `Support` - Información de soporte del API
 - `Meta` - Metadatos del API ReqRes
 - `RegisterUserInfo` - Datos para registro de usuario
+
+#### 🥒 Step Definitions (Cucumber)
+Implementaciones de los pasos de Gherkin que conectan los escenarios con el código:
+- `RegisterUserSteps` - Steps para el proceso de registro de usuarios
+- Utilizan el Screenplay Pattern con Actors, Tasks y Questions
+
+#### 🔄 Interactions (Interacciones)
+Interacciones personalizadas de bajo nivel con APIs:
+- `Post` - Interacción personalizada para peticiones POST con logging detallado
 
 ##  Troubleshooting
 

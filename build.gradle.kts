@@ -50,6 +50,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("org.junit.vintage:junit-vintage-engine:$junitVersion")
+    testImplementation("org.junit.platform:junit-platform-suite:1.10.2")
 
     // Cucumber
     implementation("io.cucumber:cucumber-java:$cucumberVersion")
@@ -91,6 +92,8 @@ tasks.withType<Test> {
     }
     
     systemProperty("restapi.baseurl", project.findProperty("restapi.baseurl") ?: "https://reqres.in/api")
+    systemProperty("cucumber.filter.tags", System.getProperty("cucumber.filter.tags") ?: "")
+    systemProperty("cucumber.plugin", "io.cucumber.core.plugin.SerenityReporterParallel")
 }
 
 // Configuración específica de Serenity

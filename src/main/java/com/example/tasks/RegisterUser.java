@@ -1,12 +1,11 @@
 package com.example.tasks;
 
-import com.example.models.users.RegisterUserInfo;
+import com.example.interactions.Post;
 
 import io.restassured.http.ContentType;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Performable;
 import net.serenitybdd.screenplay.Task;
-import net.serenitybdd.screenplay.rest.interactions.Post;
 
 public class RegisterUser implements Task {
 

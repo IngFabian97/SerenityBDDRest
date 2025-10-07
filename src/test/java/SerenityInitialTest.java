@@ -8,7 +8,6 @@ import com.example.tasks.RegisterUser;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.rest.abilities.CallAnApi;
-import net.serenitybdd.screenplay.rest.interactions.Get;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -48,22 +47,22 @@ public class SerenityInitialTest {
 
     }
 
-    @Test
-    public void registerUserTest() {
-        Actor fabian = Actor.named("Fabian")
-            .whoCan(CallAnApi.at(BASE_URL));
+    // @Test
+    // public void registerUserTest() {
+    //     Actor fabian = Actor.named("Fabian")
+    //         .whoCan(CallAnApi.at(BASE_URL));
 
-        RegisterUserInfo userInfo = new RegisterUserInfo();
+    //     RegisterUserInfo userInfo = new RegisterUserInfo();
 
-        userInfo.setEmail("eve.holt@reqres.in");
-        userInfo.setPassword("pistol");
+    //     userInfo.setEmail("eve.holt@reqres.in");
+    //     userInfo.setPassword("pistol");
 
-        fabian.attemptsTo(
-            RegisterUser.withInfo(userInfo)
-        ); 
+    //     fabian.attemptsTo(
+    //         RegisterUser.withInfo(userInfo)
+    //     ); 
 
-        fabian.should(seeThat("El codigo de respuesta", ResponseCode.was(), equalTo(200)));
-    }
+    //     fabian.should(seeThat("El codigo de respuesta", ResponseCode.was(), equalTo(200)));
+    // }
 
 
 
