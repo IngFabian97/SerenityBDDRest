@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+# Agregar permisos necesarios para el GITHUB_TOKEN
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+  actions: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
