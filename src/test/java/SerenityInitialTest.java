@@ -32,7 +32,7 @@ public class SerenityInitialTest {
 
         fabian.should(seeThat("El codigo de respuesta", ResponseCode.was(), equalTo(200)));
    
-        Datum user = new GetUsersQuestion().answeredBy(fabian).getData().stream()
+        Datum user = GetUsersQuestion.response().answeredBy(fabian).getData().stream()
             .filter(u -> u.getId() == 7)
             .findFirst()
             .orElse(null);

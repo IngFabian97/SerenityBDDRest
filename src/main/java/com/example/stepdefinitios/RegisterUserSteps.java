@@ -23,13 +23,13 @@ public class RegisterUserSteps {
 
     @When("el envia la informacion requerida para el registro")
     public void elEnvíaLaInformacionRequeridaParaElRegistro() {
-        RegisterUserInfo userInfo = RegisterUserInfo.builder()
+        RegisterUserInfo registerUserInfo = RegisterUserInfo.builder()
             .email("eve.holt@reqres.in")
             .password("pistol")
             .build();
 
         fabian.attemptsTo(
-            RegisterUser.withInfo(userInfo)
+            RegisterUser.withInfo(registerUserInfo)
         ); 
     }
 

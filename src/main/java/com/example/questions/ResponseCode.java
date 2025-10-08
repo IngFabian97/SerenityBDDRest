@@ -4,7 +4,7 @@ import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
 import net.serenitybdd.rest.SerenityRest;
 
-public class ResponseCode implements Question {
+public class ResponseCode implements Question<Integer> {
     
     public static Question<Integer> was() {
         return new ResponseCode();
@@ -14,5 +14,4 @@ public class ResponseCode implements Question {
     public Integer answeredBy(Actor actor) {
        return SerenityRest.lastResponse().statusCode();
     }
-
 }
